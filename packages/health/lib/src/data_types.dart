@@ -114,6 +114,7 @@ const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
   HealthDataType.BODY_TEMPERATURE: HealthDataUnit.DEGREE_CELSIUS,
   HealthDataType.ELECTRODERMAL_ACTIVITY: HealthDataUnit.SIEMENS,
   HealthDataType.HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
+  HealthDataType.RESPIRATORY_RATE: HealthDataUnit.BEATS_PER_MINUTE,
   HealthDataType.HEIGHT: HealthDataUnit.METERS,
   HealthDataType.RESTING_HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
   HealthDataType.STEPS: HealthDataUnit.COUNT,
