@@ -11,11 +11,6 @@ enum HealthDataType {
   BODY_FAT_PERCENTAGE,
   BODY_MASS_INDEX,
   BODY_TEMPERATURE,
-  DIETARY_CARBS_CONSUMED,
-  DIETARY_ENERGY_CONSUMED,
-  DIETARY_FATS_CONSUMED,
-  DIETARY_PROTEIN_CONSUMED,
-  FORCED_EXPIRATORY_VOLUME,
   HEART_RATE,
   HEART_RATE_VARIABILITY_SDNN,
   HEIGHT,
@@ -33,10 +28,11 @@ enum HealthDataType {
   SLEEP_IN_BED,
   SLEEP_ASLEEP,
   SLEEP_AWAKE,
-  EXERCISE_TIME,
-  WORKOUT,
+  // sle@coligomed.com START
+  RESPIRATORY_RATE,
+  // sle@coligomed.com END
 
-  // Heart Rate events (specific to Apple Watch)
+// Heart Rate events (specific to Apple Watch)
   HIGH_HEART_RATE_EVENT,
   LOW_HEART_RATE_EVENT,
   IRREGULAR_HEART_RATE_EVENT,
@@ -54,12 +50,7 @@ const List<HealthDataType> _dataTypeKeysIOS = [
   HealthDataType.BODY_FAT_PERCENTAGE,
   HealthDataType.BODY_MASS_INDEX,
   HealthDataType.BODY_TEMPERATURE,
-  HealthDataType.DIETARY_CARBS_CONSUMED,
-  HealthDataType.DIETARY_ENERGY_CONSUMED,
-  HealthDataType.DIETARY_FATS_CONSUMED,
-  HealthDataType.DIETARY_PROTEIN_CONSUMED,
   HealthDataType.ELECTRODERMAL_ACTIVITY,
-  HealthDataType.FORCED_EXPIRATORY_VOLUME,
   HealthDataType.HEART_RATE,
   HealthDataType.HEART_RATE_VARIABILITY_SDNN,
   HealthDataType.HEIGHT,
@@ -78,8 +69,9 @@ const List<HealthDataType> _dataTypeKeysIOS = [
   HealthDataType.SLEEP_AWAKE,
   HealthDataType.SLEEP_ASLEEP,
   HealthDataType.WATER,
-  HealthDataType.EXERCISE_TIME,
-  HealthDataType.WORKOUT,
+  // sle@coligomed.com START
+  HealthDataType.RESPIRATORY_RATE,
+  // sle@coligomed.com END
 ];
 
 /// List of data types available on Android
@@ -114,12 +106,7 @@ const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
   HealthDataType.BODY_FAT_PERCENTAGE: HealthDataUnit.PERCENTAGE,
   HealthDataType.BODY_MASS_INDEX: HealthDataUnit.NO_UNIT,
   HealthDataType.BODY_TEMPERATURE: HealthDataUnit.DEGREE_CELSIUS,
-  HealthDataType.DIETARY_CARBS_CONSUMED: HealthDataUnit.GRAMS,
-  HealthDataType.DIETARY_ENERGY_CONSUMED: HealthDataUnit.CALORIES,
-  HealthDataType.DIETARY_FATS_CONSUMED: HealthDataUnit.GRAMS,
-  HealthDataType.DIETARY_PROTEIN_CONSUMED: HealthDataUnit.GRAMS,
   HealthDataType.ELECTRODERMAL_ACTIVITY: HealthDataUnit.SIEMENS,
-  HealthDataType.FORCED_EXPIRATORY_VOLUME: HealthDataUnit.LITER,
   HealthDataType.HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
   HealthDataType.HEIGHT: HealthDataUnit.METERS,
   HealthDataType.RESTING_HEART_RATE: HealthDataUnit.BEATS_PER_MINUTE,
@@ -137,8 +124,6 @@ const Map<HealthDataType, HealthDataUnit> _dataTypeToUnit = {
   HealthDataType.SLEEP_ASLEEP: HealthDataUnit.MINUTES,
   HealthDataType.SLEEP_AWAKE: HealthDataUnit.MINUTES,
   HealthDataType.MINDFULNESS: HealthDataUnit.MINUTES,
-  HealthDataType.EXERCISE_TIME: HealthDataUnit.MINUTES,
-  HealthDataType.WORKOUT: HealthDataUnit.MINUTES,
 
   /// Heart Rate events (specific to Apple Watch)
   HealthDataType.HIGH_HEART_RATE_EVENT: HealthDataUnit.NO_UNIT,
@@ -178,8 +163,6 @@ const HealthDataTypeJsonValue = {
   HealthDataType.LOW_HEART_RATE_EVENT: 'low_heart_rate_event',
   HealthDataType.IRREGULAR_HEART_RATE_EVENT: 'irregular_heart_rate_event',
   HealthDataType.ELECTRODERMAL_ACTIVITY: 'electrodermal_activity',
-  HealthDataType.EXERCISE_TIME: 'exercise_time',
-  HealthDataType.WORKOUT: 'workout',
 };
 
 const HealthDataUnitJsonValue = {
@@ -188,7 +171,6 @@ const HealthDataUnitJsonValue = {
   HealthDataUnit.COUNT: 'count',
   HealthDataUnit.DEGREE_CELSIUS: 'degree_celsius',
   HealthDataUnit.KILOGRAMS: 'kilograms',
-  HealthDataUnit.GRAMS: 'grams',
   HealthDataUnit.METERS: 'meters',
   HealthDataUnit.MILLIGRAM_PER_DECILITER: 'milligram_per_deciliter',
   HealthDataUnit.MILLIMETER_OF_MERCURY: 'millimeter_of_mercury',
