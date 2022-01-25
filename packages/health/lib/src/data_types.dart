@@ -150,6 +150,7 @@ const HealthDataTypeJsonValue = {
   HealthDataType.BODY_MASS_INDEX: 'body_mass_index',
   HealthDataType.BODY_TEMPERATURE: 'body_temperature',
   HealthDataType.HEART_RATE: 'heart_rate',
+  HealthDataType.RESPIRATORY_RATE: 'respiratory_rate',
   HealthDataType.HEART_RATE_VARIABILITY_SDNN: 'heart_rate_variability_sdnn',
   HealthDataType.HEIGHT: 'height',
   HealthDataType.RESTING_HEART_RATE: 'resting_heart_rate',
