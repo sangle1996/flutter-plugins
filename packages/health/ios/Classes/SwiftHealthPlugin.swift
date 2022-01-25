@@ -48,7 +48,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
     let EXERCISE_TIME = "EXERCISE_TIME"
     let WORKOUT = "WORKOUT"
     // sle@coligomed.com START	
-    let RESPIRATORY_RATE = "RESPIRATORY_RATE"	    let WORKOUT = "WORKOUT"
+    let RESPIRATORY_RATE = "RESPIRATORY_RATE"
     // sle@coligomed.com END
 
     struct PluginError: Error {
@@ -332,8 +332,8 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         unitDict[SLEEP_AWAKE] = HKUnit.init(from: "")
         unitDict[EXERCISE_TIME] =  HKUnit.minute()
         unitDict[WORKOUT] = HKUnit.init(from: "")
-        // sle@coligomed.com START	        unitDict[EXERCISE_TIME] =  HKUnit.minute()
-        unitDict[RESPIRATORY_RATE] = HKUnit.init(from: "count/min")	        unitDict[WORKOUT] = HKUnit.init(from: "")
+        // sle@coligomed.com START	      
+        unitDict[RESPIRATORY_RATE] = HKUnit.init(from: "count/min")
         // sle@coligomed.com END
 
         // Set up iOS 11 specific types (ordinary health data types)
