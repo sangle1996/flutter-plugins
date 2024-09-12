@@ -79,6 +79,11 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             getData(call: call, result: result)
         }
 
+        /// Handle getTotalStepsInInterval
+        else if (call.method.elementsEqual("getTotalStepsInInterval")){
+            getTotalStepsInInterval(call: call, result: result)
+        }
+
         /// Handle writeData
         else if (call.method.elementsEqual("writeData")){
             try! writeData(call: call, result: result)
@@ -187,9 +192,15 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         
         print("Successfully called writeData with value of \(value) and type of \(type)")
         
-        let quantity = HKQuantity(unit: unitLookUp(key: type), doubleValue: value)
-        
-        let sample = HKQuantitySample(type: dataTypeLookUp(key: type) as! HKQuantityType, quantity: quantity, start: dateFrom, end: dateTo)
+        let sample: HKObject
+      
+        if (unitLookUp(key: type) == HKUnit.init(from: "")) {
+          sample = HKCategorySample(type: dataTypeLookUp(key: type) as! HKCategoryType, value: Int(value), start: dateFrom, end: dateTo)
+        } else {
+          let quantity = HKQuantity(unit: unitLookUp(key: type), doubleValue: value)
+          
+          sample = HKQuantitySample(type: dataTypeLookUp(key: type) as! HKQuantityType, quantity: quantity, start: dateFrom, end: dateTo)
+        }
         
         HKHealthStore().save(sample, withCompletion: { (success, error) in
             if let err = error {
@@ -222,19 +233,19 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             switch samplesOrNil {
             case let (samples as [HKQuantitySample]) as Any:
                 
+                let dictionaries = samples.map { sample -> NSDictionary in
+                    let unit = self.unitLookUp(key: dataTypeKey)
+                    return [
+                        "uuid": "\(sample.uuid)",
+                        "value": sample.quantity.doubleValue(for: unit),
+                        "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
+                        "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
+                        "source_id": sample.sourceRevision.source.bundleIdentifier,
+                        "source_name": sample.sourceRevision.source.name
+                    ]
+                }
                 DispatchQueue.main.async {
-                    result(samples.map { sample -> NSDictionary in
-                        let unit = self.unitLookUp(key: dataTypeKey)
-
-                        return [
-                            "uuid": "\(sample.uuid)",
-                            "value": sample.quantity.doubleValue(for: unit),
-                            "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
-                            "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
-                            "source_id": sample.sourceRevision.source.bundleIdentifier,
-                            "source_name": sample.sourceRevision.source.name
-                        ]
-                    })
+                    result(dictionaries)
                 }
                 
             case var (samplesCategory as [HKCategorySample]) as Any:
@@ -247,38 +258,83 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                 if (dataTypeKey == self.SLEEP_ASLEEP) {
                     samplesCategory = samplesCategory.filter { $0.value == 1 }
                 }
-                
+                let categories = samplesCategory.map { sample -> NSDictionary in
+                    return [
+                        "uuid": "\(sample.uuid)",
+                        "value": sample.value,
+                        "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
+                        "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
+                        "source_id": sample.sourceRevision.source.bundleIdentifier,
+                        "source_name": sample.sourceRevision.source.name
+                    ]
+                }
                 DispatchQueue.main.async {
-                    result(samplesCategory.map { sample -> NSDictionary in
-                        return [
-                            "uuid": "\(sample.uuid)",
-                            "value": sample.value,
-                            "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
-                            "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
-                            "source_id": sample.sourceRevision.source.bundleIdentifier,
-                            "source_name": sample.sourceRevision.source.name
-                        ]
-                    })
+                    result(categories)
                 }
                 
             case let (samplesWorkout as [HKWorkout]) as Any:
+                
+                let dictionaries = samplesWorkout.map { sample -> NSDictionary in
+                    return [
+                        "uuid": "\(sample.uuid)",
+                        "value": Int(sample.duration),
+                        "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
+                        "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
+                        "source_id": sample.sourceRevision.source.bundleIdentifier,
+                        "source_name": sample.sourceRevision.source.name
+                    ]
+                }
+                
                 DispatchQueue.main.async {
-                    result(samplesWorkout.map { sample -> NSDictionary in
-                        return [
-                            "uuid": "\(sample.uuid)",
-                            "value": Int(sample.duration),
-                            "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
-                            "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
-                            "source_id": sample.sourceRevision.source.bundleIdentifier,
-                            "source_name": sample.sourceRevision.source.name
-                        ]
-                    })
+                    result(dictionaries)
                 }
                 
             default:
                 DispatchQueue.main.async {
                     result(nil)
                 }
+            }
+        }
+
+        HKHealthStore().execute(query)
+    }
+
+     func getTotalStepsInInterval(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let arguments = call.arguments as? NSDictionary
+        let startDate = (arguments?["startDate"] as? NSNumber) ?? 0
+        let endDate = (arguments?["endDate"] as? NSNumber) ?? 0
+
+        // Convert dates from milliseconds to Date()
+        let dateFrom = Date(timeIntervalSince1970: startDate.doubleValue / 1000)
+        let dateTo = Date(timeIntervalSince1970: endDate.doubleValue / 1000)
+
+        let sampleType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+        let predicate = HKQuery.predicateForSamples(withStart: dateFrom, end: dateTo, options: .strictStartDate)
+
+        let query = HKStatisticsQuery(quantityType: sampleType,
+            quantitySamplePredicate: predicate,
+            options: .cumulativeSum) { query, queryResult, error in
+
+            guard let queryResult = queryResult else {
+                let error = error! as NSError
+                print("Error getting total steps in interval \(error.localizedDescription)")
+                
+                DispatchQueue.main.async {
+                    result(nil)
+                }
+                return
+            }
+
+            var steps = 0.0
+
+            if let quantity = queryResult.sumQuantity() {
+                let unit = HKUnit.count()
+                steps = quantity.doubleValue(for: unit)
+            }
+
+            let totalSteps = Int(steps)
+            DispatchQueue.main.async {
+                result(totalSteps)
             }
         }
 
